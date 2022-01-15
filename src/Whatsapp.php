@@ -17,34 +17,34 @@ class Whatsapp
     /** @var HttpClient HTTP Client */
     protected $http;
 
-    protected $token;
+    protected $whatsappSession;
 
     /** @var string Whatsapp Bot API Base URI */
     protected $apiBaseUri;
 
-    public function __construct(string $token = null, HttpClient $httpClient = null, string $apiBaseUri = null)
+    public function __construct(string $whatsappSession = null, HttpClient $httpClient = null, string $apiBaseUri = null)
     {
-        $this->token = $token;
+        $this->whatsappSession = $whatsappSession;
         $this->http = $httpClient ?? new HttpClient();
         $this->setApiBaseUri($apiBaseUri ?? 'http://localhost:3000');
     }
 
     /**
-     * Token getter.
+     * Session getter.
      */
-    public function getToken(): ?string
+    public function getWhatsappSession(): ?string
     {
-        return $this->token;
+        return $this->whatsappSession;
     }
 
     /**
-     * Token setter.
+     * Whatsapp setter.
      *
      * @return $this
      */
-    public function setToken(string $token): self
+    public function setWhatsappSession(string $whatsappSession): self
     {
-        $this->token = $token;
+        $this->whatsappSession = $whatsappSession;
 
         return $this;
     }
@@ -152,11 +152,11 @@ class Whatsapp
      */
     protected function sendRequest(string $endpoint, array $params, bool $multipart = false): ?ResponseInterface
     {
-        if (blank($this->token)) {
-            throw CouldNotSendNotification::whatsappBotTokenNotProvided('You must provide your whatsapp bot token to make any API requests.');
+        if (blank($this->whatsappSession)) {
+            throw CouldNotSendNotification::whatsappBotWhatsappSessionNotProvided('You must provide your whatsapp session to make any API requests.');
         }
 
-        $apiUri = sprintf('%s/bot%s/%s', $this->apiBaseUri, $this->token, $endpoint);
+        $apiUri = sprintf('%s/bot%s/%s', $this->apiBaseUri, $this->whatsappSession, $endpoint);
 
         try {
             return $this->httpClient()->post($apiUri, [

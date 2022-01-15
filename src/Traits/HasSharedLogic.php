@@ -7,8 +7,8 @@ namespace NotificationChannels\Whatsapp\Traits;
  */
 trait HasSharedLogic
 {
-    /** @var string Bot Token. */
-    public $token;
+    /** @var string Bot whatsappSession. */
+    public $whatsappSession;
     /** @var array Params payload. */
     protected $payload = [];
 
@@ -75,24 +75,24 @@ trait HasSharedLogic
     }
 
     /**
-     * Bot Token.
-     * Overrides default bot token with the given value for this notification.
+     * Whatsapp Session.
+     * Overrides default whatsappSession with the given value for this notification.
      *
      * @return $this
      */
-    public function token(string $token): self
+    public function whatsappSession(string $whatsappSession): self
     {
-        $this->token = $token;
+        $this->whatsappSession = $whatsappSession;
 
         return $this;
     }
 
     /**
-     * Determine if bot token is given for this notification.
+     * Determine if whatsapp session is given for this notification.
      */
-    public function hasToken(): bool
+    public function hasWhatsappSession(): bool
     {
-        return null !== $this->token;
+        return null !== $this->whatsappSession;
     }
 
     /**

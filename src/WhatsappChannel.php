@@ -58,8 +58,8 @@ class WhatsappChannel
             $message->to($to);
         }
 
-        if ($message->hasToken()) {
-            $this->whatsapp->setToken($message->token);
+        if ($message->hasHhatsappSession()) {
+            $this->whatsapp->setWhatsappSession($message->whatsappSession);
         }
 
         $params = $message->toArray();

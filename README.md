@@ -55,10 +55,10 @@ composer require felipedamacenoteodoro/whatsapp-notification-channel
 Set your venom session [Venom Session](https://orkestral.github.io/venom/pages/Getting%20Started/creating-client.html) and configure your Whatsapp Session:
 
 ```php
-# config/services.php
+# config/whatsapp-notification-channel/services.php
 
 'whatsapp-bot-api' => [
-    'session' => env('WHATSAPP_API_SESSION', 'YOUR API WHATSAPP SESSION HERE')
+    'whatsappSession' => env('WHATSAPP_API_SESSION', 'YOUR API WHATSAPP SESSION HERE')
 ],
 ```
 
@@ -318,7 +318,7 @@ Notification::send($recipients, new InvoicePaid());
 > These methods are optional and shared across all the API methods.
 
 - `to(int|string $chatId)`: Recipient's chat id.
-- `token(string $token)`: Bot token if you wish to override the default token for a specific notification.
+- `token(string $session)`: Session if you wish to override the default token for a specific notification.
 - `button(string $text, string $url, int $columns = 2)`: Adds an inline "Call to Action" button. You can add as many as you want, and they'll be placed 2 in a row by default.
 - `buttonWithCallback(string $text, string $callback_data, int $columns = 2)`: Adds an inline button with the given callback data. You can add as many as you want, and they'll be placed 2 in a row by default.
 - `disableNotification(bool $disableNotification = true)`: Send the message silently. Users will receive a notification with no sound.

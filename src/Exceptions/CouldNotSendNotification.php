@@ -30,11 +30,11 @@ class CouldNotSendNotification extends Exception
     }
 
     /**
-     * Thrown when there's no bot token provided.
+     * Thrown when there's no whatsapp session provided.
      *
      * @return static
      */
-    public static function whatsappBotTokenNotProvided(string $message): self
+    public static function whatsappBotWhatsappSessionNotProvided(string $message): self
     {
         return new static($message);
     }

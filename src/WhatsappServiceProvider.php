@@ -19,16 +19,23 @@ class WhatsappServiceProvider extends ServiceProvider
     {
         $this->app->bind(WhatsApp::class, static function () {
             return new WhatsApp(
-                config('services.whatsapp-bot-api.token'),
+                config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSession'),
                 app(HttpClient::class),
-                config('services.whatsapp-bot-api.base_uri')
+                config('whatsapp-notification-channel.services.whatsapp-bot-api.base_uri')
             );
         });
 
         Notification::resolved(static function (ChannelManager $service) {
-            $service->extend('whatsApp', static function ($app) {
-                return $app->make(WhatsAppChannel::class);
+            $service->extend('whatsapp', static function ($app) {
+                return $app->make(WhatsappChannel::class);
             });
         });
+    }
+
+    public function boot()
+    {
+        $this->publishes([
+            $this->basePath('config') => config_path()
+        ], 'whatsapp-notification-channel-config');
     }
 }
