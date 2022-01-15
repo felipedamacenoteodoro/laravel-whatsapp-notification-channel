@@ -262,7 +262,7 @@ Preview:
 
 ### Routing a Message
 
-You can either send the notification by providing with the chat ID of the recipient to the `to($chatId)` method like shown in the previous examples or add a `routeNotificationForWhatsapp()` method in your notifiable model:
+You can either send the notification by providing with the Number of the recipient to the `to($number)` method like shown in the previous examples or add a `routeNotificationForWhatsapp()` method in your notifiable model:
 
 ```php
 /**
@@ -307,7 +307,7 @@ Using the [notification facade][link-notification-facade] you can send a notific
 ```php
 use Illuminate\Support\Facades\Notification;
 
-// Recipients can be an array of chat IDs or collection of notifiable entities.
+// Recipients can be an array of numbers or collection of notifiable entities.
 Notification::send($recipients, new InvoicePaid());
 ```
 
@@ -317,7 +317,7 @@ Notification::send($recipients, new InvoicePaid());
 
 > These methods are optional and shared across all the API methods.
 
-- `to(int|string $chatId)`: Recipient's chat id.
+- `to(int|string $number)`: Recipient's number.
 - `token(string $session)`: Session if you wish to override the default token for a specific notification.
 - `button(string $text, string $url, int $columns = 2)`: Adds an inline "Call to Action" button. You can add as many as you want, and they'll be placed 2 in a row by default.
 - `buttonWithCallback(string $text, string $callback_data, int $columns = 2)`: Adds an inline button with the given callback data. You can add as many as you want, and they'll be placed 2 in a row by default.
