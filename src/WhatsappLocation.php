@@ -44,13 +44,13 @@ class WhatsappLocation implements JsonSerializable
      */
     public function latitude($latitude): self
     {
-        $this->payload['latitude'] = $latitude;
+        $this->payload['lat'] = $latitude;
 
         return $this;
     }
 
-    /**
-     * Location's latitude.
+     /**
+     * Location's longitude.
      *
      * @param float|string $longitude
      *
@@ -62,4 +62,34 @@ class WhatsappLocation implements JsonSerializable
 
         return $this;
     }
+
+    /**
+     * Location's title.
+     *
+     * @param string $title
+     *
+     * @return $this
+     */
+    public function title($title): self
+    {
+        $this->payload['title'] = $title;
+
+        return $this;
+    }
+
+    /**
+     * Location's latitude.
+     *
+     * @param string $description
+     *
+     * @return $this
+     */
+    public function description($description): self
+    {
+        $this->payload['description'] = $description;
+
+        return $this;
+    }
+
+
 }

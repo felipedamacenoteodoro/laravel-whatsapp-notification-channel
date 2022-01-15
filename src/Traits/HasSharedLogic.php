@@ -16,15 +16,15 @@ trait HasSharedLogic
     protected $buttons = [];
 
     /**
-     * Recipient's Chat ID.
+     * Recipient's Number.
      *
      * @param int|string $chatId
      *
      * @return $this
      */
-    public function to($chatId): self
+    public function to($number): self
     {
-        $this->payload['chat_id'] = $chatId;
+        $this->payload['number'] = $number;
 
         return $this;
     }
@@ -108,11 +108,11 @@ trait HasSharedLogic
     }
 
     /**
-     * Determine if chat id is not given.
+     * Determine if number is not given.
      */
     public function toNotGiven(): bool
     {
-        return !isset($this->payload['chat_id']);
+        return !isset($this->payload['number']);
     }
 
     /**

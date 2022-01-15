@@ -19,14 +19,17 @@ class Whatsapp
 
     protected $whatsappSession;
 
+    protected $configMethods;
+
     /** @var string Whatsapp Bot API Base URI */
     protected $apiBaseUri;
 
-    public function __construct(string $whatsappSession = null, HttpClient $httpClient = null, string $apiBaseUri = null)
+    public function __construct(string $whatsappSession = null, HttpClient $httpClient = null, string $apiBaseUri = null, array $configMapMethods = [])
     {
         $this->whatsappSession = $whatsappSession;
         $this->http = $httpClient ?? new HttpClient();
         $this->setApiBaseUri($apiBaseUri ?? 'http://localhost:3000');
+        $this->configMethods = $configMapMethods;
     }
 
     /**
@@ -84,7 +87,7 @@ class Whatsapp
 
     public function sendMessage(array $params): ?ResponseInterface
     {
-        return $this->sendRequest('sendMessage', $params);
+        return $this->sendRequest($this->configMethods['sendMessage'] ?? 'sendMessage', $params);
     }
 
     /**
@@ -94,7 +97,8 @@ class Whatsapp
      */
     public function sendFile(array $params, string $type, bool $multipart = false): ?ResponseInterface
     {
-        return $this->sendRequest('send'.Str::studly($type), $params, $multipart);
+        //  dd('send'.Str::studly($type), $params);
+        return $this->sendRequest($this->configMethods['send'.Str::studly($type)] ?? 'send'.Str::studly($type), $params, $multipart);
     }
 
     /**
@@ -102,9 +106,9 @@ class Whatsapp
      *
      * @throws CouldNotSendNotification
      */
-    public function sendPoll(array $params): ?ResponseInterface
+    public function sendLis(array $params): ?ResponseInterface
     {
-        return $this->sendRequest('sendPoll', $params);
+        return $this->sendRequest('sendList', $params);
     }
 
     /**
@@ -114,17 +118,7 @@ class Whatsapp
      */
     public function sendContact(array $params): ?ResponseInterface
     {
-        return $this->sendRequest('sendContact', $params);
-    }
-
-    /**
-     * Get updates.
-     *
-     * @throws CouldNotSendNotification
-     */
-    public function getUpdates(array $params): ?ResponseInterface
-    {
-        return $this->sendRequest('getUpdates', $params);
+        return $this->sendRequest($this->configMethods['sendContact'] ?? 'sendContact', $params);
     }
 
     /**
@@ -134,7 +128,7 @@ class Whatsapp
      */
     public function sendLocation(array $params): ?ResponseInterface
     {
-        return $this->sendRequest('sendLocation', $params);
+        return $this->sendRequest($this->configMethods['sendLocation'] ?? 'sendLocation', $params);
     }
 
     /**
@@ -156,8 +150,7 @@ class Whatsapp
             throw CouldNotSendNotification::whatsappBotWhatsappSessionNotProvided('You must provide your whatsapp session to make any API requests.');
         }
 
-        $apiUri = sprintf('%s/bot%s/%s', $this->apiBaseUri, $this->whatsappSession, $endpoint);
-
+        $apiUri = sprintf('%s/%s', $this->apiBaseUri, $endpoint);
         try {
             return $this->httpClient()->post($apiUri, [
                 $multipart ? 'multipart' : 'form_params' => $params,

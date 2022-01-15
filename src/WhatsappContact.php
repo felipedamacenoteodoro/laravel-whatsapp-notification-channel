@@ -29,7 +29,7 @@ class WhatsappContact implements JsonSerializable
      */
     public function phoneNumber(string $phoneNumber): self
     {
-        $this->payload['phone_number'] = $phoneNumber;
+        $this->payload['contact'] = $phoneNumber;
 
         return $this;
     }
@@ -41,7 +41,16 @@ class WhatsappContact implements JsonSerializable
      */
     public function firstName(string $firstName): self
     {
+        $this->payload['name'] = $firstName;
         $this->payload['first_name'] = $firstName;
+
+        return $this;
+    }
+
+
+    public function name(string $name): self
+    {
+        $this->payload['name'] = $name;
 
         return $this;
     }
@@ -53,6 +62,7 @@ class WhatsappContact implements JsonSerializable
      */
     public function lastName(string $lastName): self
     {
+        $this->payload['name'] .= ' ' . $lastName;
         $this->payload['last_name'] = $lastName;
 
         return $this;

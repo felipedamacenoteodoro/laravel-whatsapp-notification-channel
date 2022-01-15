@@ -39,7 +39,7 @@ class WhatsappChannel
      *
      * @throws CouldNotSendNotification
      */
-    public function send($notifiable, Notification $notification): ?array
+    public function send($notifiable, Notification $notification)
     {
         $message = $notification->toWhatsapp($notifiable);
 
@@ -58,7 +58,7 @@ class WhatsappChannel
             $message->to($to);
         }
 
-        if ($message->hasHhatsappSession()) {
+        if ($message->hasWhatsappSession()) {
             $this->whatsapp->setWhatsappSession($message->whatsappSession);
         }
 

@@ -12,16 +12,28 @@ use Illuminate\Support\ServiceProvider;
  */
 class WhatsappServiceProvider extends ServiceProvider
 {
+
+    public function boot()
+    {
+        $this->loadConfigs();
+
+        $this->publishes([
+            $this->basePath('config') => config_path()
+        ], 'whatsapp-notification-channel-config');
+    }
+
+
     /**
      * Register the application services.
      */
     public function register(): void
     {
-        $this->app->bind(WhatsApp::class, static function () {
-            return new WhatsApp(
+        $this->app->bind(Whatsapp::class, static function () {
+            return new Whatsapp(
                 config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSession'),
                 app(HttpClient::class),
-                config('whatsapp-notification-channel.services.whatsapp-bot-api.base_uri')
+                config('whatsapp-notification-channel.services.whatsapp-bot-api.base_uri'),
+                config('whatsapp-notification-channel.services.whatsapp-bot-api.mapMethods')
             );
         });
 
@@ -32,10 +44,13 @@ class WhatsappServiceProvider extends ServiceProvider
         });
     }
 
-    public function boot()
+    protected function loadConfigs()
     {
-        $this->publishes([
-            $this->basePath('config') => config_path()
-        ], 'whatsapp-notification-channel-config');
+        $this->mergeConfigFrom($this->basePath('config/whatsapp-notification-channel/services.php'), 'whatsapp-notification-channel.services');
+    }
+
+    protected function basePath($path = '')
+    {
+        return __DIR__ . '/../' . $path;
     }
 }

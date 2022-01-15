@@ -18,7 +18,7 @@ class CouldNotSendNotification extends Exception
     public static function whatsappRespondedWithAnError(ClientException $exception): self
     {
         if (!$exception->hasResponse()) {
-            return new static('Whatsapp responded with an error but no response body found');
+            return new static('Whatsapp api responded with an error but no response body found');
         }
 
         $statusCode = $exception->getResponse()->getStatusCode();
@@ -26,7 +26,7 @@ class CouldNotSendNotification extends Exception
         $result = json_decode($exception->getResponse()->getBody()->getContents(), false);
         $description = $result->description ?? 'no description given';
 
-        return new static("Whatsapp responded with an error `{$statusCode} - {$description}`", 0, $exception);
+        return new static("Whatsapp api responded with an error `{$statusCode} - {$description}`", 0, $exception);
     }
 
     /**
@@ -48,6 +48,6 @@ class CouldNotSendNotification extends Exception
      */
     public static function couldNotCommunicateWithWhatsapp($message): self
     {
-        return new static("The communication with Whatsapp failed. `{$message}`");
+        return new static("The communication with Whatsapp api failed. `{$message}`");
     }
 }

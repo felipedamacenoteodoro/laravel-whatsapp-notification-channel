@@ -14,8 +14,8 @@ class WhatsappFile implements JsonSerializable
 {
     use HasSharedLogic;
 
-    /** @var string content type. */
-    public $type = 'document';
+    /** @var string content document. */
+    public $type = 'Document';
 
     public function __construct(string $content = '')
     {
@@ -53,8 +53,12 @@ class WhatsappFile implements JsonSerializable
     {
         $this->type = $type;
 
+        if (null !== $filename) {
+            $this->payload['fileName'] = $filename;
+        }
+
         if (is_string($file) && !$this->isReadableFile($file)) {
-            $this->payload[$type] = $file;
+            $this->payload['path'] = $file;
 
             return $this;
         }
@@ -63,10 +67,6 @@ class WhatsappFile implements JsonSerializable
             'name' => $type,
             'contents' => is_resource($file) ? $file : fopen($file, 'rb'),
         ];
-
-        if (null !== $filename) {
-            $this->payload['file']['filename'] = $filename;
-        }
 
         return $this;
     }
@@ -97,7 +97,7 @@ class WhatsappFile implements JsonSerializable
     }
 
     /**
-     * Attach a document or any file as document.
+     * Attach a path or any file as path.
      *
      * Use this method to send general files.
      *
@@ -106,6 +106,18 @@ class WhatsappFile implements JsonSerializable
     public function document(string $file, string $filename = null): self
     {
         return $this->file($file, 'document', $filename);
+    }
+
+    /**
+     * Attach a path or any file as path.
+     *
+     * Use this method to send general files.
+     *
+     * @return $this
+     */
+    public function file64(string $file, string $filename = null): self
+    {
+        return $this->file($file, 'file64', $filename);
     }
 
     /**
@@ -130,32 +142,6 @@ class WhatsappFile implements JsonSerializable
     public function animation(string $file): self
     {
         return $this->file($file, 'animation');
-    }
-
-    /**
-     * Attach a voice file.
-     *
-     * Use this method to send audio files, if you want Whatsapp clients to display the file as a playable voice
-     * message. For this to work, your audio must be in an .ogg file encoded with OPUS.
-     *
-     * @return $this
-     */
-    public function voice(string $file): self
-    {
-        return $this->file($file, 'voice');
-    }
-
-    /**
-     * Attach a video note file.
-     *
-     * Whatsapp clients support rounded square mp4 videos of up to 1 minute long.
-     * Use this method to send video messages.
-     *
-     * @return $this
-     */
-    public function videoNote(string $file): self
-    {
-        return $this->file($file, 'video_note');
     }
 
     /**
