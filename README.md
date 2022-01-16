@@ -15,9 +15,8 @@ The packages is 100% free and opensource, if you are interested in hiring paid s
 ## Contents
 
 - [Installation](#installation)
-  - [Setting up your Whatsapp session](#setting-up-your-whatsapp-bot)
-  - [Retrieving SESSION ID](#retrieving-chat-id)
-  - [Using in Lumen](#using-in-lumen)
+  - [Setting up your Whatsapp session](#setting-up-your-whatsapp-session)
+
   - [Proxy or Bridge Support](#proxy-or-bridge-support)
 - [Usage](#usage)
   - [Text Notification](#text-notification)
@@ -71,8 +70,14 @@ Set your venom session [Venom Session](https://orkestral.github.io/venom/pages/G
 # config/whatsapp-notification-channel/services.php
 
 'whatsapp-bot-api' => [
-    'whatsappSession' => env('WHATSAPP_API_SESSION', 'YOUR API WHATSAPP SESSION HERE')
-],
+        'whatsappSessionFieldName' => env('WHATSAPP_API_SESSION_FIELD_NAME', ''), //Session field name
+        'whatsappSession' => env('WHATSAPP_API_SESSION', ''), // session value
+        'base_uri' => env('WHATSAPP_API_BASE_URL', ''), //  Your venom base url api
+        'mapMethods' => [ 
+            'sendMessage' => 'sendText',
+            'sendDocument' => 'sendFile',
+        ], /* If you want to change the methods that will be called in the api, you can map them here, example: sendMessage will be replaced by the sendText method of the api */
+    ],
 ```
 
 ## Proxy or Bridge Support

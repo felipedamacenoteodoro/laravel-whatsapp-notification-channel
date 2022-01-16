@@ -152,6 +152,7 @@ class Whatsapp
 
         $apiUri = sprintf('%s/%s', $this->apiBaseUri, $endpoint);
         try {
+            $params[config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSessionFieldName')] = config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSession');
             return $this->httpClient()->post($apiUri, [
                 $multipart ? 'multipart' : 'form_params' => $params,
             ]);
