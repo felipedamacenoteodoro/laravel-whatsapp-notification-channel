@@ -1,5 +1,5 @@
 {
-    "name": "felipedamacenoteodoro/whatsapp-notification-channel",
+    "name": "felipedamacenoteodoro/laravel-whatsapp-notification-channel",
     "description": "Whatsapp Notifications Channel for Laravel",
     "keywords": [
         "whatsapp notification",
@@ -8,7 +8,7 @@
         "notification",
         "whatsapp notifications channel"
     ],
-    "homepage": "https://github.com/felipedamacenoteodoro/whatsapp-notification-channel",
+    "homepage": "https://github.com/felipedamacenoteodoro/laravel-whatsapp-notification-channel",
     "license": "MIT",
     "authors": [
         {

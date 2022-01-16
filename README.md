@@ -52,7 +52,7 @@ The packages is 100% free and opensource, if you are interested in hiring paid s
 You can install the package via composer:
 
 ```bash
-composer require felipedamacenoteodoro/whatsapp-notification-channel
+composer require felipedamacenoteodoro/laravel-whatsapp-notification-channel
 ```
 
 ## Publish config file
@@ -312,12 +312,12 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
-[ico-version]: https://img.shields.io/packagist/v/laravel-notification-channels/whatsapp.svg?style=flat-square
+[ico-version]: https://img.shields.io/packagist/v/felipedamacenoteodoro/laravel-whatsapp-notification-channel.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-downloads]: https://img.shields.io/packagist/dt/laravel-notification-channels/whatsapp.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/felipedamacenoteodoro/laravel-whatsapp-notification-channel.svg?style=flat-square
 
-[link-repo]: https://github.com/felipedamacenoteodoro/laravel-notification-channels-whatsapp
-[link-packagist]: https://packagist.org/packages/laravel-notification-channels/whatsapp
+[link-repo]: https://github.com/felipedamacenoteodoro/laravel-whatsapp-notification-channel
+[link-packagist]: https://packagist.org/packages/felipedamacenoteodoro/laravel-whatsapp-notification-channel
 [link-author]: https://www.linkedin.com/in/felipedamacenoteodoro
 [link-contributors]: ../../contributors
 [link-notification-facade]: https://laravel.com/docs/8.x/notifications#using-the-notification-facade
