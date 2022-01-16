@@ -58,7 +58,7 @@ class WhatsappLocation implements JsonSerializable
      */
     public function longitude($longitude): self
     {
-        $this->payload['longitude'] = $longitude;
+        $this->payload['log'] = $longitude;
 
         return $this;
     }

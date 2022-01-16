@@ -30,51 +30,6 @@ trait HasSharedLogic
     }
 
     /**
-     * Add an inline button.
-     *
-     * @return $this
-     */
-    public function button(string $text, string $url, int $columns = 2): self
-    {
-        $this->buttons[] = compact('text', 'url');
-
-        $this->payload['reply_markup'] = json_encode([
-            'inline_keyboard' => array_chunk($this->buttons, $columns),
-        ]);
-
-        return $this;
-    }
-
-    /**
-     * Add an inline button with callback_data.
-     *
-     * @return $this
-     */
-    public function buttonWithCallback(string $text, string $callback_data, int $columns = 2): self
-    {
-        $this->buttons[] = compact('text', 'callback_data');
-
-        $this->payload['reply_markup'] = json_encode([
-            'inline_keyboard' => array_chunk($this->buttons, $columns),
-        ]);
-
-        return $this;
-    }
-
-    /**
-     * Send the message silently.
-     * Users will receive a notification with no sound.
-     *
-     * @return $this
-     */
-    public function disableNotification(bool $disableNotification = true): self
-    {
-        $this->payload['disable_notification'] = $disableNotification;
-
-        return $this;
-    }
-
-    /**
      * Whatsapp Session.
      * Overrides default whatsappSession with the given value for this notification.
      *
