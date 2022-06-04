@@ -11,3 +11,7 @@ All notable changes to `whatsapp` will be documented in this file
 ## 1.0.1 - 2022-01-16
 
 - Add session field name on config file
+
+## 1.0.2 - 2022-06-04
+
+- Add laravel 9 support
