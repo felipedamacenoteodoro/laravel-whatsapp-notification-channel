@@ -26,10 +26,10 @@ class Whatsapp
 
     public function __construct(string $whatsappSession = null, HttpClient $httpClient = null, string $apiBaseUri = null, array $configMapMethods = [])
     {
-        $this->whatsappSession = $whatsappSession;
+        $this->whatsappSession = $whatsappSession ?? config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSession');
         $this->http = $httpClient ?? new HttpClient();
-        $this->setApiBaseUri($apiBaseUri ?? 'http://localhost:3000');
-        $this->configMethods = $configMapMethods;
+        $this->setApiBaseUri($apiBaseUri ?? config('whatsapp-notification-channel.services.whatsapp-bot-api.base_uri') ?? 'http://localhost:3000');
+        $this->configMethods = $configMapMethods ?: config('whatsapp-notification-channel.services.whatsapp-bot-api.mapMethods') ?: [];
     }
 
     /**
@@ -152,7 +152,7 @@ class Whatsapp
 
         $apiUri = sprintf('%s/%s', $this->apiBaseUri, $endpoint);
         try {
-            $params[config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSessionFieldName')] = config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSession');
+            $params[config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSessionFieldName')] = $this->whatsappSession;
             return $this->httpClient()->post($apiUri, [
                 $multipart ? 'multipart' : 'form_params' => $params,
             ]);
