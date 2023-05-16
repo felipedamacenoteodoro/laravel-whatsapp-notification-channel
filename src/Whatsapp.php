@@ -106,9 +106,20 @@ class Whatsapp
      *
      * @throws CouldNotSendNotification
      */
-    public function sendLis(array $params): ?ResponseInterface
+    public function sendList(array $params): ?ResponseInterface
     {
         return $this->sendRequest('sendList', $params);
+    }
+
+    /**
+     * Send a Poll.
+     *
+     * @deprecated Use sendList(array $params): ?ResponseInterface.
+     * @throws CouldNotSendNotification
+     */
+    public function sendLis(array $params): ?ResponseInterface
+    {
+        return $this->sendList($params);
     }
 
     /**
