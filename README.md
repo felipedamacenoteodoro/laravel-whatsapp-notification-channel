@@ -4,7 +4,7 @@
 [![Software License][ico-license]](LICENSE.md)
 [![Total Downloads][ico-downloads]][link-packagist]
 
-This package makes it easy to send Whatsapp notification using [Venom API](https://github.com/orkestral/venom) with Laravel.
+This package makes it easy to send Whatsapp notification using [WPPCONNECT SERVER]([[https://github.com/orkestral/venom](https://github.com/wppconnect-team/wppconnect-server)]([https://github.com/wppconnect-team/wppconnect](https://github.com/wppconnect-team/wppconnect-server))) with Laravel.
 
 This package was created based on the telegram notification package.
 
@@ -64,7 +64,7 @@ php artisan vendor:publish --tag=whatsapp-notification-channel-config
 
 ## Setting up your Whatsapp session
 
-Set your venom session [Venom Session](https://orkestral.github.io/venom/pages/Getting%20Started/creating-client.html) and configure your Whatsapp Session:
+Set your venom session [WPPCONNECT SERVER]([https://orkestral.github.io/venom/pages/Getting%20Started/creating-client.html](https://github.com/wppconnect-team/wppconnect-server)) and configure your Whatsapp Session:
 
 ```php
 # config/whatsapp-notification-channel/services.php
