@@ -21,6 +21,8 @@ class Whatsapp
 
     protected $configMethods;
 
+    protected $apiKey;
+
     /** @var string Whatsapp Bot API Base URI */
     protected $apiBaseUri;
 
@@ -30,6 +32,7 @@ class Whatsapp
         $this->http = $httpClient ?? new HttpClient();
         $this->setApiBaseUri($apiBaseUri ?? config('whatsapp-notification-channel.services.whatsapp-bot-api.base_uri') ?? 'http://localhost:3000');
         $this->configMethods = $configMapMethods ?: config('whatsapp-notification-channel.services.whatsapp-bot-api.mapMethods') ?: [];
+        $this->apiKey = config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappApiKey');
     }
 
     /**
@@ -155,6 +158,7 @@ class Whatsapp
             $params[config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSessionFieldName')] = $this->whatsappSession;
             return $this->httpClient()->post($apiUri, [
                 $multipart ? 'multipart' : 'form_params' => $params,
+                'headers' => $this->apiKey ? ['X-Api-Key' => $this->apiKey] : []
             ]);
         } catch (ClientException $exception) {
             throw CouldNotSendNotification::whatsappRespondedWithAnError($exception);
