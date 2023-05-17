@@ -156,8 +156,6 @@ class Whatsapp
             return $this->httpClient()->post($apiUri, [
                 $multipart ? 'multipart' : 'form_params' => $params,
             ]);
-        } catch (ClientException $exception) {
-            throw CouldNotSendNotification::whatsappRespondedWithAnError($exception);
         } catch (Exception $exception) {
             throw CouldNotSendNotification::couldNotCommunicateWithWhatsapp($exception);
         }
