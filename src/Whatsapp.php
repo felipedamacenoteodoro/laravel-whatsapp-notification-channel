@@ -154,7 +154,7 @@ class Whatsapp
         try {
             $params[config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSessionFieldName')] = $this->whatsappSession;
             return $this->httpClient()->post($apiUri, [
-                $multipart ? 'multipart' : 'form_params' => $params,
+                $multipart ? 'multipart' : 'json' => $params,
             ]);
         } catch (ClientException $exception) {
             throw CouldNotSendNotification::whatsappRespondedWithAnError($exception);
