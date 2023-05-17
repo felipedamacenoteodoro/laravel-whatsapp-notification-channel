@@ -10,4 +10,5 @@
 /tests              export-ignore
 /.github            export-ignore
 /.editorconfig      export-ignore
+/CONTRIBUTING.md    export-ignore
 /.php-cs-fixer.dist.php export-ignore
