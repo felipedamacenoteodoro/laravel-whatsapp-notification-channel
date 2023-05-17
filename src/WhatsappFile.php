@@ -45,7 +45,7 @@ class WhatsappFile implements JsonSerializable
      *
      * Generic method to attach files of any type based on API.
      *
-     * @param resource|StreamInterface|string $file
+     * @param resource|StreamInterface|string|array $file
      *
      * @return $this
      */
@@ -55,6 +55,12 @@ class WhatsappFile implements JsonSerializable
 
         if (null !== $filename) {
             $this->payload['fileName'] = $filename;
+        }
+        
+        if (is_array($file) {
+            $this->payload = array_merge($this->payload, $file);
+
+            return $this;
         }
 
         if (is_string($file) && !$this->isReadableFile($file)) {
@@ -160,7 +166,7 @@ class WhatsappFile implements JsonSerializable
      */
     public function hasFile(): bool
     {
-        return isset($this->payload['file']);
+        return is_array($this->payload['file'] ?? null) && is_resource($this->payload['file']['contents'] ?? null);
     }
 
     /**
