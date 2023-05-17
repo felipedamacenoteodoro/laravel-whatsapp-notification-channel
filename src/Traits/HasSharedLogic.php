@@ -18,13 +18,15 @@ trait HasSharedLogic
     /**
      * Recipient's Number.
      *
-     * @param int|string $chatId
+     * @param int|string $number
      *
      * @return $this
      */
     public function to($number): self
     {
         $this->payload['number'] = $number;
+        $this->payload['phone'] = $number;
+        $this->payload['chatId'] = $number;
 
         return $this;
     }
