@@ -78,7 +78,7 @@ class WhatsappChannel
                     $messages = $this->chunk($message->getPayloadValue('text'), $message->chunkSize);
 
                     $payloads = collect($messages)->filter()->map(function ($text) use ($params) {
-                        return array_merge($params, ['text' => $text]);
+                        return array_merge($params, ['text' => $text, 'message' => $text]);
                     });
 
                     if ($replyMarkup) {
