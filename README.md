@@ -290,8 +290,10 @@ For more information on supported parameters, check out these [docs](https://ork
 
 - `content(string $content)`: (optional) File caption, supports markdown. For more information on supported markdown styles, check out these [docs](https://orkestral.github.io/venom/interfaces/SendFileResult.html).
 - `view(string $view, array $data = [], array $mergeData = [])`: (optional) Blade template name with Whatsapp supported HTML or Markdown syntax content if you wish to use a view file instead of the `content()` method.
-- `file(string|resource|StreamInterface $file, string $type, string $filename = null)`: Local file path or remote URL, `$type` of the file (Ex:`photo`, `audio`, `document`, `video`, `animation`, `voice`, `video_note`) and optionally filename with extension. Ex: `sample.pdf`. You can use helper methods instead of using this to make it easier to work with file attachment.
+- `file(string|resource|StreamInterface|array $file, string $type, string $filename = null)`: Local file path or remote URL, `$type` of the file (Ex:`photo`, `audio`, `document`, `video`, `animation`, `voice`, `video_note`) and optionally filename with extension. Ex: `sample.pdf`. You can use helper methods instead of using this to make it easier to work with file attachment.
+- `file64(string $file, string $filename)`: Helper method to attach a file on base64.
 - `photo(string $file)`: Helper method to attach a photo.
+- `photo64(string $file, string $filename)`: Helper method to attach a photo on base64.
 - `audio(string $file)`: Helper method to attach an audio file (MP3 file).
 - `document(string $file, string $filename = null)`: Helper method to attach a document or any file as document.
 - `video(string $file)`: Helper method to attach a video file.

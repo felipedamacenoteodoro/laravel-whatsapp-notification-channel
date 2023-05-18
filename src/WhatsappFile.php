@@ -85,10 +85,12 @@ class WhatsappFile implements JsonSerializable
             $this->payload[$fileKey] = 'data:' . mime_content_type($file) . ';base64,' . base64_encode(file_get_contents($file));
         } else if (is_resource($file)) {
             $this->payload[$fileKey] = 'data:' . mime_content_type($file) . ';base64,' . base64_encode(stream_get_contents($file));
-        } else if(is_string($file) && filter_var($url, FILTER_VALIDATE_URL)) {
+        } else if(is_string($file) && filter_var($file, FILTER_VALIDATE_URL)) {
             $this->payload[$fileKey] = 'data:' . mime_content_type($file) . ';base64,' . base64_encode(file_get_contents($file));
-        } else if (is_string($file) && $this->type == 'file64') {
-            $this->payload[$fileKey] = 'data:' . mime_content_type($filename) . ';base64,' . $file;
+        } else if (is_string($file) && in_array($this->type, ['file64', 'photo64'])) {
+            $f = finfo_open();
+            $this->payload[$fileKey] = 'data:' . finfo_buffer($f, base64_decode($file), FILEINFO_MIME_TYPE) . ';base64,' . $file;
+            finfo_close($f);
         }
 
         if (null !== $filename) {
@@ -112,18 +114,20 @@ class WhatsappFile implements JsonSerializable
                 'mimetype' => mime_content_type($file),
                 'data' => base64_encode(stream_get_contents($file)),
             ];
-        } else if(is_string($file) && filter_var($url, FILTER_VALIDATE_URL)) {
+        } else if(is_string($file) && filter_var($file, FILTER_VALIDATE_URL)) {
             $data = [
                 'mimetype' => mime_content_type($file),
                 'filename' => basename($file),
                 'url' => $file,
             ];
-        } else if (is_string($file) && $this->type == 'file64') {
+        } else if (is_string($file) && in_array($this->type, ['file64', 'photo64'])) {
+            $f = finfo_open();
             $data = [
-                'mimetype' => mime_content_type($filename),
+                'mimetype' => finfo_buffer($f, base64_decode($file), FILEINFO_MIME_TYPE),
                 'filename' => $filename,
                 'data' => $file,
             ];
+            finfo_close($f);
         }
 
         if (null !== $filename) {
@@ -168,6 +172,18 @@ class WhatsappFile implements JsonSerializable
     }
 
     /**
+     * Attach an image base64.
+     *
+     * Use this method to send photos.
+     *
+     * @return $this
+     */
+    public function photo64(string $file, string $filename): self
+    {
+        return $this->file($file, 'photo64', $filename);
+    }
+
+    /**
      * Attach an audio file.
      *
      * Use this method to send audio files, if you want Whatsapp clients to display them in the music player.
@@ -193,13 +209,13 @@ class WhatsappFile implements JsonSerializable
     }
 
     /**
-     * Attach a path or any file as path.
+     * Attach file as base64.
      *
      * Use this method to send general files.
      *
      * @return $this
      */
-    public function file64(string $file, string $filename = null): self
+    public function file64(string $file, string $filename): self
     {
         return $this->file($file, 'file64', $filename);
     }

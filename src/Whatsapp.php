@@ -56,6 +56,7 @@ class Whatsapp
                     'sendVideo' => 'send-file-base64',
                     'sendAnimation' => 'send-image',
                     'sendPhoto' => 'send-image',
+                    'sendPhoto64' => 'send-image',
                     'sendImage' => 'send-image',
                     'sendAudio' => 'send-voice-base64',
                     'sendLocation' => 'send-location',
@@ -71,6 +72,7 @@ class Whatsapp
                     'sendVideo' => 'sendFile',
                     'sendAnimation' => 'sendImage',
                     'sendPhoto' => 'sendImage',
+                    'sendPhoto64' => 'sendImage',
                     'sendAudio' => 'sendVoice',
                     'sendContact' => 'sendContactVcard',
                 ];
@@ -82,6 +84,7 @@ class Whatsapp
                     'sendVideo' => 'sendFile',
                     'sendAnimation' => 'sendFile',
                     'sendPhoto' => 'sendFile',
+                    'sendPhoto64' => 'sendFile',
                 ];
                 break;
         }
