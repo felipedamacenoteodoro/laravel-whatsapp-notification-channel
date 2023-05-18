@@ -15,10 +15,12 @@ class WhatsappFile implements JsonSerializable
     use HasSharedLogic;
 
     /** @var string content document. */
-    public $type = 'Document';
+    public $type = 'file';
 
     public function __construct(string $content = '')
     {
+        $this->setNumberKey();
+        $this->setMessageKey('caption');
         $this->content($content);
         $this->payload['parse_mode'] = 'Markdown';
     }
@@ -35,7 +37,7 @@ class WhatsappFile implements JsonSerializable
      */
     public function content(string $content): self
     {
-        $this->payload['caption'] = $content;
+        $this->payload[$this->messageKey] = $content;
 
         return $this;
     }
@@ -49,18 +51,94 @@ class WhatsappFile implements JsonSerializable
      *
      * @return $this
      */
-    public function file($file, string $type, string $filename = null): self
+    public function file($file, string $type = 'file', string $filename = null): self
     {
         $this->type = $type;
 
-        if (null !== $filename) {
-            $this->payload['fileName'] = $filename;
-        }
-        
-        if (is_array($file) {
+        if (is_array($file)) {
             $this->payload = array_merge($this->payload, $file);
 
             return $this;
+        }
+
+        switch (Whatsapp::$apiServer) {
+            case 'wppconnect-server':
+                return $this->wppconnectServerFile($file, $filename);
+            case 'whatsapp-http-api':
+                return $this->whatsappHttpApiServerFile($file, $filename);
+            default:
+                return $this->defaultApiServerFile($file, $filename);
+        }
+    }
+
+    private function wppconnectServerFile ($file, string $filename = null): self
+    {
+        if (!in_array($this->type, ['photo', 'image'])) {
+            $this->payload['message'] = $this->payload[$this->messageKey] ?? null;
+            unset($this->payload[$this->messageKey]);
+            $this->setMessageKey('message');
+        }
+
+        $fileKey = in_array($this->type, ['audio']) ? 'base64Ptt' : 'base64';
+
+        if (is_string($file) && $this->isReadableFile($file)) {
+            $this->payload[$fileKey] = 'data:' . mime_content_type($file) . ';base64,' . base64_encode(file_get_contents($file));
+        } else if (is_resource($file)) {
+            $this->payload[$fileKey] = 'data:' . mime_content_type($file) . ';base64,' . base64_encode(stream_get_contents($file));
+        } else if(is_string($file) && filter_var($url, FILTER_VALIDATE_URL)) {
+            $this->payload[$fileKey] = 'data:' . mime_content_type($file) . ';base64,' . base64_encode(file_get_contents($file));
+        } else if (is_string($file) && $this->type == 'file64') {
+            $this->payload[$fileKey] = 'data:' . mime_content_type($filename) . ';base64,' . $file;
+        }
+
+        if (null !== $filename) {
+            $this->payload['filename'] = $filename;
+        }
+
+    }
+
+    private function whatsappHttpApiServerFile ($file, string $filename = null): self
+    {
+        $data = [];
+
+        if (is_string($file) && $this->isReadableFile($file)) {
+            $data = [
+                'mimetype' => mime_content_type($file),
+                'filename' => basename($file),
+                'data' => base64_encode(file_get_contents($file))
+            ];
+        } else if (is_resource($file)) {
+            $data = [
+                'mimetype' => mime_content_type($file),
+                'data' => base64_encode(stream_get_contents($file)),
+            ];
+        } else if(is_string($file) && filter_var($url, FILTER_VALIDATE_URL)) {
+            $data = [
+                'mimetype' => mime_content_type($file),
+                'filename' => basename($file),
+                'url' => $file,
+            ];
+        } else if (is_string($file) && $this->type == 'file64') {
+            $data = [
+                'mimetype' => mime_content_type($filename),
+                'filename' => $filename,
+                'data' => $file,
+            ];
+        }
+
+        if (null !== $filename) {
+            $data['fileName'] = $filename;
+        }
+
+        $this->payload['file'] = $data;
+
+        return $this;
+    }
+
+    private function defaultApiServerFile ($file, string $filename = null): self
+    {
+        if (null !== $filename) {
+            $this->payload['fileName'] = $filename;
         }
 
         if (is_string($file) && !$this->isReadableFile($file)) {

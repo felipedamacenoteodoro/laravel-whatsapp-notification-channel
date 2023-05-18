@@ -18,9 +18,10 @@ class WhatsappMessage implements JsonSerializable
 
     public function __construct(string $content = '')
     {
+        $this->setNumberKey();
+        $this->setMessageKey();
         $this->content($content);
         $this->payload['parse_mode'] = 'Markdown';
-        $this->payload['isGroup'] = false;
     }
 
     public static function create(string $content = ''): self
@@ -35,8 +36,7 @@ class WhatsappMessage implements JsonSerializable
      */
     public function content(string $content, int $limit = null): self
     {
-        $this->payload['text'] = $content;
-        $this->payload['message'] = $content;
+        $this->payload[$this->messageKey] = $content;
 
         if ($limit) {
             $this->chunkSize = $limit;

@@ -4,13 +4,13 @@
 [![Software License][ico-license]](LICENSE.md)
 [![Total Downloads][ico-downloads]][link-packagist]
 
-This package makes it easy to send Whatsapp notification using [WPPCONNECT SERVER]([[https://github.com/orkestral/venom](https://github.com/wppconnect-team/wppconnect-server)]([https://github.com/wppconnect-team/wppconnect](https://github.com/wppconnect-team/wppconnect-server))) with Laravel.
+This package makes it easy to send Whatsapp notification using [wppconnect-server](https://github.com/wppconnect-team/wppconnect-server), [whatsapp-http-api](https://github.com/devlikeapro/whatsapp-http-api) or any [simple whatsapp api](https://github.com/felipedamacenoteodoro/simple-whatsapp-api/tree/main) with Laravel.
 
 This package was created based on the telegram notification package.
 
-Thanks to Irfaq Syed for the codebase used here. 
+Thanks to Irfaq Syed for the codebase used here.
 
-The packages is 100% free and opensource, if you are interested in hiring paid support, installation or implementation, [Felipe D. Teodoro](https://api.whatsapp.com/send?phone=5521972745771&text=Gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20o%20suporte%20do%20pacote%20Whatsapp%20Notifications%20Channel%20for%20Laravel) 
+The packages is 100% free and opensource, if you are interested in hiring paid support, installation or implementation, [Felipe D. Teodoro](https://api.whatsapp.com/send?phone=5521972745771&text=Gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20o%20suporte%20do%20pacote%20Whatsapp%20Notifications%20Channel%20for%20Laravel)
 
 ## Contents
 
@@ -64,20 +64,24 @@ php artisan vendor:publish --tag=whatsapp-notification-channel-config
 
 ## Setting up your Whatsapp session
 
-Set your venom session [WPPCONNECT SERVER]([https://orkestral.github.io/venom/pages/Getting%20Started/creating-client.html](https://github.com/wppconnect-team/wppconnect-server)) and configure your Whatsapp Session:
+Set your [whatsapp-http-api](https://waha.devlike.pro/docs/overview/quick-start/#3-start-a-new-session)/[wppconnect-server](https://wppconnect.io/swagger/wppconnect-server/#tag/Auth/operation/generate-token(GeratokenBearerparasess%C3%A3o)) or custom session and configure your Laravel Whatsapp Session:
 
 ```php
-# config/whatsapp-notification-channel/services.php
+# config/whatsapp-notification-channel.php
 
 'whatsapp-bot-api' => [
-        'whatsappSessionFieldName' => env('WHATSAPP_API_SESSION_FIELD_NAME', ''), //Session field name
-        'whatsappSession' => env('WHATSAPP_API_SESSION', ''), // session value
-        'base_uri' => env('WHATSAPP_API_BASE_URL', ''), //  Your venom base url api
-        'mapMethods' => [ 
-            'sendMessage' => 'sendText',
-            'sendDocument' => 'sendFile',
-        ], /* If you want to change the methods that will be called in the api, you can map them here, example: sendMessage will be replaced by the sendText method of the api */
-    ],
+    'whatsappApiServer' => env('WHATSAPP_API_SERVER'), // wppconnect-server, whatsapp-http-api, default
+    'whatsappSessionFieldName' => env('WHATSAPP_API_SESSION_FIELD_NAME', ''), //Session field name
+    'whatsappSession' => env('WHATSAPP_API_SESSION', ''), // session value
+    'whatsappApiKey' => env('WHATSAPP_API_KEY'), // header api key
+    'whatsappBearerToken' => env('WHATSAPP_BEARER_TOKEN'), // authorization bearer token
+    'base_uri' => env('WHATSAPP_API_BASE_URL', ''), //  Your base url api
+    /**
+     Methods will be automatically mapped according to whatsappApiServer, but if you have a different API
+     you can map them here, example: sendMessage will be replaced by the sendText method of the api
+    */
+    'mapMethods' => [], // 'sendMessage' => 'sendText', 'sendDocument' => 'sendFile',
+],
 ```
 
 ## Proxy or Bridge Support
@@ -228,14 +232,24 @@ Notification::route('whatsapp', 'WHATSAPP_SESSION')
             ->notify(new InvoicePaid($invoice));
 ```
 
+> Also you can send messages manually
+
+```php
+$message = WhatsappMessage::create()
+        ->to('11111111111@c.us')
+        ->content("Hello there!\nYour invoice has been *PAID*");
+app()->make(\NotificationChannels\Whatsapp\Whatsapp::class)->send($message);
+
+```
+
 ### Sending to Multiple Recipients
 
 Using the [notification facade][link-notification-facade] you can send a notification to multiple recipients at once.
 
-> If you're sending bulk notifications to multiple users, the Whatsapp API will not allow more than 30 messages per second or so. 
+> If you're sending bulk notifications to multiple users, the Whatsapp API will not allow more than 30 messages per second or so.
 > Consider spreading out notifications over large intervals of 8—12 hours for best results.
 >
-> Also note that your bot will not be able to send more than 20 messages per minute to the same group. 
+> Also note that your bot will not be able to send more than 20 messages per minute to the same group.
 >
 > If you go over the limit, you'll start getting `429` errors. For more details, refer Whatsapp Api [FAQ](https://faq.whatsapp.com/).
 

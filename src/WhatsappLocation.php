@@ -12,6 +12,12 @@ class WhatsappLocation implements JsonSerializable
 {
     use HasSharedLogic;
 
+    /** @var string */
+    private $latKey;
+
+    /** @var string */
+    private $lngKey;
+
     /**
      * whatsapp Location constructor.
      *
@@ -20,7 +26,11 @@ class WhatsappLocation implements JsonSerializable
      */
     public function __construct($latitude = null, $longitude = null)
     {
+        $this->setNumberKey();
+        $this->setMessageKey(Whatsapp::$apiServer == 'wppconnect-server' ? 'address' : 'description');
+        $this->latKey = Whatsapp::$apiServer == 'whatsapp-http-api' ? 'latitude' : 'lat';
         $this->latitude($latitude);
+        $this->lngKey = Whatsapp::$apiServer == 'whatsapp-http-api' ? 'longitude' : (Whatsapp::$apiServer == 'wppconnect-server' ? 'lng' : 'log');
         $this->longitude($longitude);
     }
 
@@ -44,7 +54,7 @@ class WhatsappLocation implements JsonSerializable
      */
     public function latitude($latitude): self
     {
-        $this->payload['lat'] = $latitude;
+        $this->payload[$this->latKey] = $latitude;
 
         return $this;
     }
@@ -58,7 +68,7 @@ class WhatsappLocation implements JsonSerializable
      */
     public function longitude($longitude): self
     {
-        $this->payload['log'] = $longitude;
+        $this->payload[$this->lngKey] = $longitude;
 
         return $this;
     }
@@ -78,7 +88,7 @@ class WhatsappLocation implements JsonSerializable
     }
 
     /**
-     * Location's latitude.
+     * Location's description.
      *
      * @param string $description
      *
@@ -86,10 +96,8 @@ class WhatsappLocation implements JsonSerializable
      */
     public function description($description): self
     {
-        $this->payload['description'] = $description;
+        $this->payload[$this->messageKey] = $description;
 
         return $this;
     }
-
-
 }

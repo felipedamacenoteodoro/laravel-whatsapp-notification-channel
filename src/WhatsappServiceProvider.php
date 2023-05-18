@@ -28,14 +28,9 @@ class WhatsappServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(Whatsapp::class, static function () {
-            return new Whatsapp(
-                config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSession'),
-                app(HttpClient::class),
-                config('whatsapp-notification-channel.services.whatsapp-bot-api.base_uri'),
-                config('whatsapp-notification-channel.services.whatsapp-bot-api.mapMethods')
-            );
-        });
+        Whatsapp::$apiServer = $this->app['config']->get('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappApiServer');
+
+        $this->app->singleton(Whatsapp::class);
 
         Notification::resolved(static function (ChannelManager $service) {
             $service->extend('whatsapp', static function ($app) {
@@ -46,7 +41,7 @@ class WhatsappServiceProvider extends ServiceProvider
 
     protected function loadConfigs()
     {
-        $this->mergeConfigFrom($this->basePath('config/whatsapp-notification-channel/services.php'), 'whatsapp-notification-channel.services');
+        $this->mergeConfigFrom($this->basePath('config/whatsapp-notification-channel.php'), 'whatsapp-notification-channel');
     }
 
     protected function basePath($path = '')
