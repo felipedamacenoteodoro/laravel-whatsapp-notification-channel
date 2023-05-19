@@ -223,7 +223,8 @@ For a complete list of response fields, please refer the Venom Whatsapp API's [M
 
 ### On-Demand Notifications
 
-> Sometimes you may need to send a notification to someone who is not stored as a "user" of your application. Using the `Notification::route` method, you may specify ad-hoc notification routing information before sending the notification. For more details, you can check out the [on-demand notifications][link-on-demand-notifications] docs.
+Sometimes you may need to send a notification to someone who is not stored as a "user" of your application. Using the `Notification::route` method, you may specify ad-hoc notification routing information before sending the notification.
+>For more details, you can check out the [on-demand notifications][link-on-demand-notifications] docs.
 
 ```php
 use Illuminate\Support\Facades\Notification;
@@ -232,7 +233,7 @@ Notification::route('whatsapp', 'WHATSAPP_SESSION')
             ->notify(new InvoicePaid($invoice));
 ```
 
-> Also you can send messages manually
+Also you can send messages manually
 
 ```php
 $message = WhatsappMessage::create()
