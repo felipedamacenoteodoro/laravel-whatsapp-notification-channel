@@ -20,6 +20,7 @@ class WhatsappMessage implements JsonSerializable
     {
         $this->content($content);
         $this->payload['parse_mode'] = 'Markdown';
+        $this->payload['isGroup'] = false;
     }
 
     public static function create(string $content = ''): self
@@ -35,6 +36,7 @@ class WhatsappMessage implements JsonSerializable
     public function content(string $content, int $limit = null): self
     {
         $this->payload['text'] = $content;
+        $this->payload['message'] = $content;
 
         if ($limit) {
             $this->chunkSize = $limit;
