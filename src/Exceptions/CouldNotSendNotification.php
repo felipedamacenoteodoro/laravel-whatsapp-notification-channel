@@ -15,8 +15,6 @@ class CouldNotSendNotification extends Exception
      * Thrown when there's a bad request and an error is responded.
      *
      * @param ClientException|ServerException $exception
-     *
-     * @return static
      */
     public static function whatsappRespondedWithAnError($exception): self
     {
@@ -35,8 +33,6 @@ class CouldNotSendNotification extends Exception
 
     /**
      * Thrown when there's no whatsapp session provided.
-     *
-     * @return static
      */
     public static function whatsappBotWhatsappSessionNotProvided(string $message): self
     {
@@ -47,8 +43,6 @@ class CouldNotSendNotification extends Exception
      * Thrown when we're unable to communicate with Whatsapp.
      *
      * @param \Throwable $exception
-     *
-     * @return static
      */
     public static function couldNotCommunicateWithWhatsapp($exception): self
     {

@@ -14,6 +14,10 @@ class WhatsappContact implements JsonSerializable
 
     public function __construct(string $phoneNumber = '')
     {
+        $this->setNumberKey();
+        $this->setMessageKey(
+            in_array(Whatsapp::$apiServer, ['wppconnect-server', 'whatsapp-http-api']) ? 'contactsId' : 'contact'
+        );
         $this->phoneNumber($phoneNumber);
     }
 
@@ -29,7 +33,7 @@ class WhatsappContact implements JsonSerializable
      */
     public function phoneNumber(string $phoneNumber): self
     {
-        $this->payload['contact'] = $phoneNumber;
+        $this->payload[$this->messageKey] = $phoneNumber;
 
         return $this;
     }

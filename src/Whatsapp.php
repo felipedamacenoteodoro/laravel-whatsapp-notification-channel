@@ -14,12 +14,16 @@ use Psr\Http\Message\ResponseInterface;
  */
 class Whatsapp
 {
+    public static $apiServer;
+
     /** @var HttpClient HTTP Client */
     protected $http;
 
     protected $whatsappSession;
 
     protected $configMethods;
+
+    protected $sessionFieldName;
 
     protected $apiKey;
 
@@ -31,11 +35,59 @@ class Whatsapp
     public function __construct(string $whatsappSession = null, HttpClient $httpClient = null, string $apiBaseUri = null, array $configMapMethods = [])
     {
         $this->whatsappSession = $whatsappSession ?? config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSession');
-        $this->http = $httpClient ?? new HttpClient();
+        $this->http = $httpClient ?? app()->make(HttpClient::class);
         $this->setApiBaseUri($apiBaseUri ?? config('whatsapp-notification-channel.services.whatsapp-bot-api.base_uri') ?? 'http://localhost:3000');
         $this->configMethods = $configMapMethods ?: config('whatsapp-notification-channel.services.whatsapp-bot-api.mapMethods') ?: [];
+        $this->sessionFieldName = config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSessionFieldName');
         $this->apiKey = config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappApiKey');
         $this->bearerToken = config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappBearerToken');
+
+        if ($this->configMethods) {
+            return;
+        }
+
+        switch (self::$apiServer) {
+            case 'wppconnect-server':
+                $this->configMethods = [
+                    'sendMessage' => 'send-message',
+                    'sendDocument' => 'send-file-base64',
+                    'sendFile' => 'send-file-base64',
+                    'sendFile64' => 'send-file-base64',
+                    'sendVideo' => 'send-file-base64',
+                    'sendAnimation' => 'send-image',
+                    'sendPhoto' => 'send-image',
+                    'sendPhoto64' => 'send-image',
+                    'sendImage' => 'send-image',
+                    'sendAudio' => 'send-voice-base64',
+                    'sendLocation' => 'send-location',
+                    'sendContact' => 'contact-vcard',
+                ];
+                break;
+            case 'whatsapp-http-api':
+                $this->configMethods = [
+                    'sendMessage' => 'sendText',
+                    'sendDocument' => 'sendFile',
+                    'sendFile' => 'sendFile',
+                    'sendFile64' => 'sendFile',
+                    'sendVideo' => 'sendFile',
+                    'sendAnimation' => 'sendImage',
+                    'sendPhoto' => 'sendImage',
+                    'sendPhoto64' => 'sendImage',
+                    'sendAudio' => 'sendVoice',
+                    'sendContact' => 'sendContactVcard',
+                ];
+                break;
+            default:
+                $this->configMethods = [
+                    'sendMessage' => 'sendText',
+                    'sendDocument' => 'sendFile',
+                    'sendVideo' => 'sendFile',
+                    'sendAnimation' => 'sendFile',
+                    'sendPhoto' => 'sendFile',
+                    'sendPhoto64' => 'sendFile',
+                ];
+                break;
+        }
     }
 
     /**
@@ -90,6 +142,14 @@ class Whatsapp
         return $this;
     }
 
+    /**
+     * Get HttpClient.
+     */
+    protected function httpClient(): HttpClient
+    {
+        return $this->http;
+    }
+
 
     public function sendMessage(array $params): ?ResponseInterface
     {
@@ -101,10 +161,10 @@ class Whatsapp
      *
      * @throws CouldNotSendNotification
      */
-    public function sendFile(array $params, string $type, bool $multipart = false): ?ResponseInterface
+    public function sendFile(array $params, string $type = 'file', bool $multipart = false): ?ResponseInterface
     {
-        //  dd('send'.Str::studly($type), $params);
-        return $this->sendRequest($this->configMethods['send'.Str::studly($type)] ?? 'send'.Str::studly($type), $params, $multipart);
+        $method = 'send'.Str::studly($type);
+        return $this->sendRequest($this->configMethods[$method] ?? $method, $params, $multipart);
     }
 
     /**
@@ -114,7 +174,7 @@ class Whatsapp
      */
     public function sendList(array $params): ?ResponseInterface
     {
-        return $this->sendRequest('sendList', $params);
+        return $this->sendRequest($this->configMethods['sendList'] ?? 'sendList', $params);
     }
 
     /**
@@ -149,11 +209,91 @@ class Whatsapp
     }
 
     /**
-     * Get HttpClient.
+     * Send a message.
+     *
+     * @var WhatsappMessage|WhatsappFile|WhatsappLocation|WhatsappContact $message
+     *
+     * @throws CouldNotSendNotification
      */
-    protected function httpClient(): HttpClient
+    public function send($message): ?ResponseInterface
     {
-        return $this->http;
+        if ($message->toNotGiven()) {
+            return null;
+        }
+
+        if ($message->hasWhatsappSession()) {
+            $this->setWhatsappSession($message->whatsappSession);
+        }
+
+        $params = $message->toArray();
+
+        $sendMethod = str_replace('Whatsapp', 'send', array_reverse(explode('\\', get_class($message)))[0]);
+
+        if ($message instanceof WhatsappMessage) {
+            if ($message->shouldChunk()) {
+                $replyMarkup = $message->getPayloadValue('reply_markup');
+
+                if ($replyMarkup) {
+                    unset($params['reply_markup']);
+                }
+
+                $messages = $this->chunk($message->getPayloadValue($message->messageKey), $message->chunkSize);
+
+                $payloads = collect($messages)->filter()->map(function ($text) use ($message, $params) {
+                    return array_merge($params, [$message->messageKey => $text]);
+                });
+
+                if ($replyMarkup) {
+                    $lastMessage = $payloads->pop();
+                    $lastMessage['reply_markup'] = $replyMarkup;
+                    $payloads->push($lastMessage);
+                }
+
+                return $payloads->map(function ($payload) {
+                    $response = $this->sendMessage($payload);
+
+                    // To avoid rate limit of one message per second.
+                    sleep(1);
+
+                    if ($response) {
+                        return json_decode($response->getBody()->getContents(), true);
+                    }
+
+                    return $response;
+                })->toArray();
+            }
+
+            return $this->sendMessage($params);
+        } elseif ($message instanceof WhatsappFile) {
+            return $this->sendFile($params, $message->type, $message->hasFile());
+        } elseif (method_exists($this, $sendMethod)) {
+            return $this->{$sendMethod}($params);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Chunk the given string into an array of strings.
+     */
+    public function chunk(string $value, int $limit = 4096): array
+    {
+        if (mb_strwidth($value, 'UTF-8') <= $limit) {
+            return [$value];
+        }
+
+        if ($limit >= 4097) {
+            $limit = 4096;
+        }
+
+        $output = explode('%#TGMSG#%', wordwrap($value, $limit, '%#TGMSG#%'));
+
+        // Fallback for when the string is too long and wordwrap doesn't cut it.
+        if (count($output) <= 1) {
+            $output = mb_str_split($value, $limit, 'UTF-8');
+        }
+
+        return $output;
     }
 
     /**
@@ -168,8 +308,8 @@ class Whatsapp
         }
 
         $apiUri = sprintf('%s/%s', $this->apiBaseUri, $endpoint);
+        $params[$this->sessionFieldName] = $this->whatsappSession;
         try {
-            $params[config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSessionFieldName')] = $this->whatsappSession;
             return $this->httpClient()->post($apiUri, [
                 $multipart ? 'multipart' : 'form_params' => $params,
                 'headers' => array_merge(

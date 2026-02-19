@@ -2,6 +2,8 @@
 
 namespace NotificationChannels\Whatsapp\Traits;
 
+use NotificationChannels\Whatsapp\Whatsapp;
+
 /**
  * Trait HasSharedLogic.
  */
@@ -9,12 +11,49 @@ trait HasSharedLogic
 {
     /** @var string Bot whatsappSession. */
     public $whatsappSession;
+
+    /** @var string */
+    public $numberKey;
+
+    /** @var string */
+    public $messageKey;
+
     /** @var array Params payload. */
     protected $payload = [];
 
     /** @var array Inline Keyboard Buttons. */
     protected $buttons = [];
 
+    private function setNumberKey($numberKey = null)
+    {
+        $this->numberKey = $numberKey;
+
+        if ($this->numberKey) {
+            return;
+        }
+
+        switch (Whatsapp::$apiServer) {
+            case 'wppconnect-server':
+                $this->numberKey = 'phone';
+                return;
+            case 'whatsapp-http-api':
+                $this->numberKey = 'chatId';
+                return;
+            default:
+                $this->numberKey = 'number';
+        }
+    }
+
+    private function setMessageKey($messageKey = null)
+    {
+        $this->messageKey = $messageKey;
+
+        if ($this->messageKey) {
+            return;
+        }
+
+        $this->messageKey = Whatsapp::$apiServer == 'wppconnect-server' ? 'message' : 'text';
+    }
     /**
      * Recipient's Number.
      *
@@ -24,9 +63,7 @@ trait HasSharedLogic
      */
     public function to($number): self
     {
-        $this->payload['number'] = $number;
-        $this->payload['phone'] = $number;
-        $this->payload['chatId'] = $number;
+        $this->payload[$this->numberKey] = $number;
 
         return $this;
     }
@@ -69,7 +106,7 @@ trait HasSharedLogic
      */
     public function toNotGiven(): bool
     {
-        return !isset($this->payload['number']);
+        return !isset($this->payload[$this->numberKey]);
     }
 
     /**
@@ -95,7 +132,7 @@ trait HasSharedLogic
      *
      * @return mixed
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->toArray();
     }
