@@ -171,7 +171,7 @@ class Whatsapp
         try {
             $params[config('whatsapp-notification-channel.services.whatsapp-bot-api.whatsappSessionFieldName')] = $this->whatsappSession;
             return $this->httpClient()->post($apiUri, [
-                $multipart ? 'multipart' : 'form_params' => $params,
+                $multipart ? 'multipart' : 'json' => $params,
                 'headers' => array_merge(
                     ['Accept' => 'application/json'],
                     $this->apiKey ? ['X-Api-Key' => $this->apiKey] : [],
