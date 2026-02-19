@@ -4,6 +4,7 @@ namespace NotificationChannels\Whatsapp\Exceptions;
 
 use Exception;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ServerException;
 
 /**
  * Class CouldNotSendNotification.
@@ -13,9 +14,11 @@ class CouldNotSendNotification extends Exception
     /**
      * Thrown when there's a bad request and an error is responded.
      *
+     * @param ClientException|ServerException $exception
+     *
      * @return static
      */
-    public static function whatsappRespondedWithAnError(ClientException $exception): self
+    public static function whatsappRespondedWithAnError($exception): self
     {
         if (!$exception->hasResponse()) {
             return new static('Whatsapp api responded with an error but no response body found');
@@ -43,12 +46,18 @@ class CouldNotSendNotification extends Exception
     /**
      * Thrown when we're unable to communicate with Whatsapp.
      *
-     * @param $message
+     * @param \Throwable $exception
      *
      * @return static
      */
-    public static function couldNotCommunicateWithWhatsapp($message): self
+    public static function couldNotCommunicateWithWhatsapp($exception): self
     {
-        return new static("The communication with Whatsapp api failed. `{$message}`");
+        if (is_a($exception, ClientException::class) || is_a($exception, ServerException::class)) {
+            return self::whatsappRespondedWithAnError($exception);
+        }
+
+        $message = $exception->getMessage();
+
+        return new static("The communication with Whatsapp api failed. `{$message}`", 0, $exception);
     }
 }

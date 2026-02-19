@@ -178,8 +178,6 @@ class Whatsapp
                     $this->bearerToken ? ['Authorization' => 'Bearer ' . $this->bearerToken] : [],
                 )
             ]);
-        } catch (ClientException $exception) {
-            throw CouldNotSendNotification::whatsappRespondedWithAnError($exception);
         } catch (Exception $exception) {
             throw CouldNotSendNotification::couldNotCommunicateWithWhatsapp($exception);
         }
